@@ -2,11 +2,11 @@ var Player = (function() {
 	var MOVE_SPEED = 1;
 
 	function Player(config) {
-		this.x = config.x;
-		this.y = config.y;
+		this.x = this.default_x = config.x;
+		this.y = this.default_y = config.y;
 		this.color = 'rgb(255, 255, 255)';
 		this.track_color = config.track_color;
-		this.direction = config.direction;
+		this.direction = this.default_direction = config.direction;
 		this.radius = 2;
 
 	}
@@ -82,7 +82,6 @@ var Player = (function() {
 
 		collisions: function(lines) {
 			for (var i = 0; i < lines.length - 1; i++) {
-				console.log("same x", this.x === lines[i].startpoint.x)
 				if (this.x === lines[i].startpoint.x && 
 					(this.y >= Math.min(lines[i].startpoint.y, lines[i].endpoint.y) &&
 						this.y <= Math.max(lines[i].startpoint.y, lines[i].endpoint.y)) ||
@@ -96,6 +95,13 @@ var Player = (function() {
 				}
 			}
 			return false;
+		},
+
+		reset: function() {
+			this.x = this.default_x;
+			this.y = this.default_y;
+			this.direction = this.default_direction;
+			this.init();
 		}
 	}
 

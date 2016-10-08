@@ -2,7 +2,8 @@ var Tron = (function() {
 	var board,
 		player1,
 		player2,
-		game_over = false;
+		game_over = false,
+		winner_message;
 
 	function loop() {
 		board.draw();
@@ -12,7 +13,14 @@ var Tron = (function() {
 
 		game_over = (player1.lines.length > 0 && player2.lines.length && hasCollisions());
 
-		if (!game_over) {
+		if (game_over) {
+			popup.endGame({
+				message: winner_message,
+				callback: resetGame,
+				color: 'rgb(50, 50, 50)'
+			})
+		}
+		else {
 			player1.draw(board.ctx);
 			player2.draw(board.ctx);
 
@@ -22,19 +30,19 @@ var Tron = (function() {
 
 	function setupListeners() {
 		document.addEventListener('keydown', function(e) {
-			if (e.keyCode === 39) {
+			if (e.keyCode === 68) {
 				// right
 				player1.turn(1);
 			}
-			else if (e.keyCode === 37) {
+			else if (e.keyCode === 65) {
 				// left
 				player1.turn(-1);
 			}
-			else if (e.keyCode === 68) {
+			else if (e.keyCode === 39) {
 				// right
 				player2.turn(1);
 			}
-			else if (e.keyCode === 65) {
+			else if (e.keyCode === 37) {
 				// left 
 				player2.turn(-1);
 			}
@@ -42,8 +50,28 @@ var Tron = (function() {
 	}
 
 	function hasCollisions() {
-		return player1.collisions(player2.lines.concat(player1.lines)) || 
-				player2.collisions(player1.lines.concat(player2.lines));
+		var player1_collision = player1.collisions(player2.lines.concat(player1.lines));
+		var player2_collision = player2.collisions(player1.lines.concat(player2.lines))
+		
+		if (player1_collision && player2_collision) {
+			winner_message = 'Tie Game!';
+		}
+		else if (player1_collision) {
+			winner_message = 'Player 2 (blue) wins!';
+		}
+		else if (player2_collision) {
+			winner_message = 'Player 1 (red) wins!';
+		}
+		else {
+			winner_message = undefined;
+		}
+		
+		return  player1_collision || player2_collision
+	}
+
+	function resetGame() {
+		player1.reset();
+		player2.reset();
 	}
 
 	return {
@@ -55,7 +83,7 @@ var Tron = (function() {
 			board.init();
 
 			player1 = new Player({
-				x: 10,
+				x: 0,
 				y: board.height / 2,
 				track_color: 'rgb(255, 0, 0)',
 				direction: 1
@@ -64,7 +92,7 @@ var Tron = (function() {
 			player1.init();
 
 			player2 = new Player({
-				x: 590,
+				x: 600,
 				y: board.height / 2,
 				track_color: 'rgb(0, 0, 255)',
 				direction: 3
@@ -74,7 +102,11 @@ var Tron = (function() {
 
 			setupListeners();
 
-			loop();
+			popup = new Popup.Popup({
+				board: board
+			});
+
+			popup.init(loop);
 		},
 
 		loop: function() {
