@@ -6,13 +6,14 @@ var Player = (function() {
 		this.y = this.default_y = config.y;
 		this.color = 'rgb(255, 255, 255)';
 		this.track_color = config.track_color;
-		this.direction = this.default_direction = config.direction;
+		this.default_direction = config.direction;
+		this.direction = this.default_direction;
 		this.radius = 2;
 
 	}
 
 	Player.prototype = {
-		init: function() {
+		init: function(boardHeight, boardWidth) {
 			var line = new Line({
 				startpoint: {
 					x: this.x,
@@ -22,7 +23,8 @@ var Player = (function() {
 			});
 
 			this.lines = [line];
-
+			this.boardHeight = boardHeight;
+			this.boardWidth = boardWidth;
 		},
 
 		move: function() {
@@ -81,6 +83,10 @@ var Player = (function() {
 		},
 
 		collisions: function(lines) {
+			if (this.x < 0 || this.y < 0 || this.x > this.boardWidth || this.y > this.boardHeight) {
+				return true;
+			}
+
 			for (var i = 0; i < lines.length - 1; i++) {
 				if (this.x === lines[i].startpoint.x && 
 					(this.y >= Math.min(lines[i].startpoint.y, lines[i].endpoint.y) &&
@@ -101,7 +107,7 @@ var Player = (function() {
 			this.x = this.default_x;
 			this.y = this.default_y;
 			this.direction = this.default_direction;
-			this.init();
+			this.init(this.boardHeight, this.boardWidth);
 		}
 	}
 

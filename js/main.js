@@ -89,7 +89,7 @@ var Tron = (function() {
 				direction: 1
 			});
 
-			player1.init();
+			player1.init(board.height, board.width);
 
 			player2 = new Player({
 				x: 600,
@@ -98,7 +98,7 @@ var Tron = (function() {
 				direction: 3
 			});
 
-			player2.init();
+			player2.init(board.height, board.width);
 
 			setupListeners();
 
